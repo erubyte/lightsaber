@@ -1,0 +1,6 @@
+[submodule "research/sources/ProffieOS"]
+	path = research/sources/ProffieOS
+	url = https://github.com/profezzorn/ProffieOS.git
+[submodule "research/sources/ProffieOSDocs"]
+	path = research/sources/ProffieOSDocs
+	url = https://github.com/profezzorn/ProffieOSDocs.git

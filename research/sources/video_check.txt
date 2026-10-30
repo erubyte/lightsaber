@@ -1,0 +1,44 @@
+5YCPjyLCgik | Which Lightsaber Should You Buy? Baselit vs RGB vs Neopixel vs Proffie | Lightsaber Life
+8IIn5f6VJXU | Neopixel Lightsaber Comparison! PROFFIE VS XENOPIXEL V3 | Hyperdrive A Star Wars Channel
+cfX-QMycWHI | BEFORE YOU BUY! Xeno V3 vs SNV4 Pro Lightsabers:15 Things to Know | The Collectors Outpost
+ctIokjjpyeE | Basic Overview of LGT NEXUS Lightsabers | Beginner's Guide | The Frugal Jedi
+zQhPWJJg6Og | CFX Proffie Asteria Lightsaber Soundboard "Smooth Swing" Comparison | Karma Ruth
+5X0lVbjMqo0 | 10 AMAZING SOUND FONTS FOR YOUR NEOPIXEL LIGHTSABER | PROFFIE | CFX | VERSO | XENOPIXEL | GHV3 | Absolute Sabers
+6GyPUVNupHI | 25 Epic Lightsaber Soundfonts Reviewed on Custom Saber | Full Demo + Reaction! | Civilized Sabers
+tVfU-bP_9zc | Proffie Guide for Beginners | Part 1 - Things You'll Need | The Frugal Jedi
+hKMzLO-BrY0 | Proffie Guide for Beginners | Part 2 - The Config File Explained | The Frugal Jedi
+_2ybJzdksJM | Proffie Guide for Beginners | Part 4 - Adding Soundfonts, Fett263 Edit Mode and the Workbench | The Frugal Jedi
+cpc-u7ITMZc | How to Set Up Proffieboard in Arduino | ProffieOS & Config File Tutorial | CCSabers
+ULYvY5tHxiQ | A Complete Guide to Proffie Configuration | Elegant Weapon 3 | Danovation
+Lm5Ksxzjo94 | 2023 Proffie programming tutorial.  Includes software installation/config and SD Authoring/Program | Megtooth Sith Sabers
+2H4XMSKajCI | Proffie and TeensySaber Bladestyle Editor Tutorial | Megtooth Sith Sabers
+j174vaBcCRg | "Crash Course" Proffieboard Style Editor and Adding Styles to your config | Fett263
+s2YesPkcBlQ | ProffieOS6 Edit Mode Using ProffieOS Workbench (Demo) | Fett263
+zpiVQQ6_vNA | ProffieOS6 Edit Mode - Edit Mode Menu Controls (Demo) | Fett263
+QkJDleupPiI | Sneak Peek - Edit Mode - New "Edit Settings" Menu for ProffieOS 6 | Fett263
+D7f3nvYhuuE | Sneak Peek "Battle Mode 2.0" for ProffieOS6 | Fett263
+OSLcsOIYjBM | "Real Clash" for ProffieOS6 - Take 2 (Effect and Sound demo) | Fett263
+yngYYY_vnCk | Fett263 2/3 Button Controls for ProffieOS6 | Fett263
+zDfFwEFjyw8 | Teaser - New Interactive "Kyber Select" Blade Styles for ProffieOS6 | Fett263
+0AL8kOmtbu0 | ProffieOS7 Fett263 Prop Updates - Expanded "Special Abilities" and Custom Preset Controls | Fett263
+w4j5HHL0rik | ProffieOS7 Fett263 Prop Updates - New Quote Capabilities / Custom Controls | Fett263
+7ntJn2Sv3V4 | ProffieOS7 POC Sneak Peek - Interactive Preon Effects | Fett263
+5gEBfoYp-x4 | ProffieOS7 Early Access Library Phase 4 - ANH Training Remote Mini Game | Fett263
+bfAOkI_xLZg | ProffieOS7 ANH Training Remote Mini Game Library Demo | Fett263
+AXI8c3hz7gE | Proffieboard Config Helper v1.5 | Fett263
+kqK0EJ9dMZs | Introducing the Sabersense™ Proffieboard Control System | Sabersense
+kmF9YKo-XXc | Neopixel Batteries Ultimate Test with Quantum and KR 3.6 blade strips | ShtokCustomWorx
+sSEnhoULsMo | Dark Disciple | An Unproduced Clone Wars Season 7 Story Arc | David Wadey
+HlPX1A5_ASg | Upgrading Proffie Lightsaber to OS6 with Fett263's EDIT MODE! | Megtooth Sith Sabers
+dsoQUtR3fvU | How to Program a Proffieboard - Setup & Config Basics - DIY Lightsaber | State of Build
+jz7HhsmLa1o | Introducing new Preon Effects for ProffieOS 4 Neopixel Lightsabers | Fett263
+INkuR66y9P8 | Sneak Peek / Proof of Concept - New Accelerating / Decelerating Ignition and Retraction Effects | Fett263
+Ce-wcEEqmng | Sneak Peak - "Edit Mode" for ProffieOS - Styles/Colors/Fonts/Tracks/Volume + Copy & Delete on Saber | Fett263
+RqiudYQ9H3I | Proffie Guide for Beginners | Part 3 - Introducing Fett263 | The Frugal Jedi
+bEAGc9CJD-c | Neopixel Blades: Inside & Out | Darth Cephalus
+nYj-dcC36Ys | ProffieOS7 Fett263 Prop Updates - Circular Volume Menu with Visual Effect Option | Fett263
+2_u1U-6p_ho | "He-Man" Gesture Based Multi-Phase Power Sword Transformation for Early Access ProffieOS7/8 | Fett263
+dLYtuSuSkxA | NEW! Gesture Based Special Abilities and Multi-Phase Transitions - ProffieOS7 Early Access Library | Fett263
+pIMODGYTgDw | Pull to the Darkness / Corruption | Fett263
+atQ_eadZl1U | The Acolyte - New & Improved "Cortosis Clash V2" Special Ability for ProffieOS7 Early Access | Fett263
+Vj2SJFbRCAk | 2019 Proffie 2 2 Programming(see links info below video, expand info under vid) | Megtooth Sith Sabers

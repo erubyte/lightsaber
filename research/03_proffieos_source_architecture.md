@@ -1,0 +1,67 @@
+# ProffieOS source architecture (for the CS/ECE reader)
+
+Read from a shallow clone of https://github.com/profezzorn/ProffieOS (master, commit 96131ef, 2026-10-26, "Better SubBladeWithList"). Local copy: `sources/ProffieOS/`. About 80,800 lines of C++ (headers mostly), GPLv3.
+
+## Build model
+- It's an Arduino sketch: `ProffieOS.ino` includes everything. You pick a config with `#define CONFIG_FILE "config/xyz.h"`.
+- The config header is included **several times** with different `CONFIG_*` macros defined (`CONFIG_TOP`, `CONFIG_PROP`, `CONFIG_PRESETS`, `CONFIG_STYLES`, `CONFIG_BUTTONS`), so one file injects defines, the prop class, the preset tables and the button objects into different parts of the build.
+- Board support comes from the "Proffieboard Arduino core" (arduino-proffieboard by profezzorn, derived from Thomas Roell's STM32L4 core for the Butterfly/Dragonfly).
+- Unit tests run on the host with g++: `styles/tests.cpp`, `blades/tests.cpp`, `buttons/tests.cpp`, `common/tests.cpp`, `sound/tests.cpp`, `display/tests.cpp` (`make test` in each dir).
+
+## Module map (line counts are approximate)
+| Dir | Lines | What it is |
+|---|---|---|
+| `props/` | 19.4k | Prop files = the "application": button/gesture state machines. `saber_fett263_buttons.h` alone is huge. Also blaster, detonator, HEV suit, micom, audiofx, dual_prop (switch between saber and blaster props). |
+| `common/` | 10.6k | Kernel-ish utilities: `looper.h` scheduler, `state_machine.h` coroutines, `saber_base.h` event bus, `command_parser.h` serial shell, `fuse.h` IMU fusion, `quat.h`, `vec3.h`, `battery_monitor.h`, `config_file.h` INI parser, `lsfs.h` file system wrapper, `sd_card.h`. |
+| `sound/` | 8.7k | Audio: `buffered_wav_player.h`, `dynamic_mixer.h`, `hybrid_font.h` (Plecter/NEC/Proffie font layouts), `smooth_swing_v2.h`, `talkie.h` (speech synth for error messages without SD), `click_avoider_lin.h`, `dac.h` (I²S out via DMA), `filter.h`. |
+| `styles/` | 8.3k | The blade style template library (layers, colors, effects). |
+| `display/` | 7.0k | SSD1306 OLED and new 16-bit SPI color displays, layer compositing, Aurebesh and StarJedi fonts. |
+| `blades/` | 5.0k | LED drivers: `stm32l4_ws2811.h` (timer + DMA WS2811 bit-banging-free driver), `simple_blade.h` (PWM in-hilt LEDs), `sub_blade.h` (split one strip into several logical blades), `blade_id.h`, `power_pin.h`. |
+| `functions/` | 3.1k | Scalar functions used by styles: `swing_speed.h`, `blade_angle.h`, `twist_angle.h`, `sound_level.h`, `clash_impact.h`, `battery_level.h`, `readpin.h`, `svf.h`... |
+| `modes/` | 2.1k | OS 8 menu framework: `menu_base.h`, `settings_menues.h`, `color_menues.h`, `preset_modes.h`. |
+| `buttons/` | 1.8k | Debounced, latching, touch (capacitive), rotary, potentiometer, FastButton. |
+| `transitions/` | 1.3k | Transition templates (`TrWipe`, `TrFade`, `TrConcat`, `TrBoing`, `TrDelay`, `TrDoEffect`...). |
+| `motion/` | 0.9k | IMU drivers: LSM6DS3H (Proffieboard), MPU6050, FXOS8700 + FXAS21002 (Teensy prop shield). |
+| `ir/` | 0.8k | IR receive/send: NEC and RC6 protocols, blaster tag. |
+| `mtp/` | 1.1k | Media Transfer Protocol storage. |
+| `pov_tools/`, `pqoi/`, `videotoblc/`, `fontconvert/` | | Host tools: persistence-of-vision image converter, PQOI/PQF image codec, video to blade animation converter, font converter for displays. |
+| `scripts/` | 0.7k | On-device test scripts: `clash_recorder.h` (records IMU data around clashes), `motion_startup_recorder.h`, board self-test. |
+
+## Runtime model
+- **No RTOS.** `common/looper.h` keeps a linked list of `Looper` objects. `loop()` calls each one in turn. "High-frequency loopers" sit at the end of the list.
+- **Coroutines via Duff's device.** `common/state_machine.h`: `YIELD()` stores `__LINE__` and returns; the next call `switch`es back to that line. `SLEEP(ms)`, `SLEEP_MICROS`, `CALL`. The header comment calls these lightweight pseudo-threads. Drivers like the IMU are written as linear code with `YIELD()` between I²C steps.
+- **Event bus.** `common/saber_base.h`: `SaberBase` is a linked list of listeners (fonts, blades, displays, props). Static `Do*()` methods broadcast: `DoOn`, `DoOff`, `DoEffect(EFFECT_CLASH, location)`, `DoBeginLockup`, `DoBlast`, `DoForce`, `DoBoot`, `DoPreOn`, `DoBladeDetect`, `DoMotion`, `DoAccel`. Sounds and blade styles both subscribe, so a clash triggers audio and the flash on the blade from one event. `EffectLocation` lets effects happen at a point on the blade (blast and clash location).
+- **Serial shell.** `common/command_parser.h`: any object can register commands. That's how `on`, `off`, `clash`, `sdtest`, `top`, `monitor`, `scanid`, `list_presets`, `battery_voltage` etc. exist. `top` prints CPU time per Looper (a profiler).
+- **Audio.** Polyphonic WAV players feed a dynamic mixer, out via DMA to the I²S class-D amp at 44.1 kHz/16-bit. Gapless with 2.5 ms crossfade. The 5 V boost converter turns on only when sound plays.
+- **LEDs.** On STM32L4, WS2811/WS2812 timing is generated by a hardware timer (TIM1/TIM2) at 80 MHz with DMA, so the CPU doesn't bit-bang. Frame rate depends on pixel count (WS2812 is 30 µs per pixel at 800 kHz).
+- **Motion.** LSM6DS3H configured for **1.66 kHz accelerometer (±16 g) and 1.66 kHz gyro (±2000 dps)** over I²C (`motion/lsm6ds3h.h`). `fuse.h` fuses accel and gyro into orientation, speed and "down" vector for gestures, blade angle and twist.
+
+## SmoothSwing V2 (sound/smooth_swing_v2.h), explained
+- Credit in the source: "SmoothSwing V2, based on Thexter's excellent work", original description on The Rebel Armory forum.
+- A font supplies pairs of looping swing sounds: `swingl` (low) and `swingh` (high), or `lswing`/`hswing`. All loops play continuously at zero volume, in sync with the hum.
+- Each motion update: gyro is box-filtered, then `speed = sqrt(gz² + gy²)` (rotation rate perpendicular to the blade axis, so twisting the hilt doesn't count as a swing).
+- `swing_strength = min(1, speed / SwingSensitivity)`. Volume curve is `swing_strength ^ SwingSharpness`.
+- An accumulated rotation angle (`A.rotate(-speed * dt)`) moves through crossfade regions (`Transition1Degrees`, `Transition2Degrees`, separations), so as you keep swinging, the mix slides from the low loop to the high loop and back. The direction and length of the swing changes the timbre.
+- The hum ducks by up to `MaximumHumDucking` percent as swing volume rises.
+- Defaults (`smooth_swing_config.h`, overridable per font in `smoothsw.ini`): SwingSensitivity 450 (deg/s), MaximumHumDucking 75, SwingSharpness 1.75, SwingStrengthThreshold 20, Transition1Degrees 45, Transition2Degrees 160, MaxSwingVolume 3.0, AccentSwingSpeedThreshold 0 (off), AccentSlashAccelerationThreshold 260.
+- **Accent swings**: if the font also has `swng`/`slsh` files and the threshold is set, a fast swing also fires a discrete one-shot swing sound on top of the SmoothSwing mix.
+- There's also a CFX-compatible config file reader (`smooth_swing_cfx_config.h`) so CFX fonts' swing settings carry over.
+
+## Blade styles, explained (styles/README.md)
+- "Styles are used to calculate the color for each pixel on the blade." Even `RED` is a style template, so any color argument can be replaced by an animated expression.
+- Each style implements `run(BladeBase*)` once per frame (put heavier math here) and `getColor(int led)` once per LED per frame (keep it cheap; it's called thousands of times per second).
+- Styles compose: `Layers<Base, AlphaL<...>, TransitionEffectL<...>, ResponsiveClashL<...>, InOutTrL<ignition, retraction>>`. Functions (`SwingSpeed<>`, `BladeAngle<>`, `TwistAngle<>`, `SoundLevel`, `ClashImpactF`) return 0–32768 scalars that drive mixes and positions.
+- Because styles are C++ templates, the compiler inlines the whole expression tree into a per-LED function. That's how complex animations run on an 80 MHz Cortex-M4.
+- `style_parser.h` also parses styles from **strings** at runtime (named "basic parser styles", argument overrides). Edit Mode and ProffieOS Workbench rely on argument slots (`COLOR_ARG`, `IGNITION_OPTION_ARG`, ...) stored in INI files on the SD card, so you can change colors/timings without recompiling.
+
+## Hacker hooks worth telling him about
+1. **Serial monitor** over USB: shell commands, `top` profiler, `monitor` streams for motion/clash data.
+2. **SWD pads** (SWDIO, SWCLK) on the board for ST-LINK debugging with breakpoints.
+3. **Host unit tests** for styles and blades.
+4. **Write a prop**: subclass `PropBase`, handle `Event(BUTTON, EVENT)` and motion events. The OS ships 11 props to learn from.
+5. **Write a style or function**: a small template class with `run()` and `getColor()`; can be tested on the host.
+6. **ReadPinF / AnalogReadPinF** (OS 8): read GPIO from a blade style. Servo support (OS 8).
+7. **Clash recorder script** to capture IMU traces for tuning clash detection.
+8. **IR** receive/transmit (laser-tag style blaster props).
+9. **POV tools**: wave the blade in the dark and it paints an image (StylePOV; ships with a Star Wars logo).
+10. **Talkie**: a speech synthesizer so the board can speak errors with no SD card.
