@@ -558,7 +558,7 @@ def page_controls(pn):
     return f"""<div class="page"><h1>Control</h1>
 <div class="ref"><div>{sub("Blade off", "#E44F44")}{col(off)}</div><div>{sub("Blade on", GREEN)}{col(on)}</div></div>
 <p class="tip">↑ parallel or up · ↓ down · ↑↑ straight up</p>
-<p class="tip">Scroll presets: turn the hilt, Click to select. Volume: turn the hilt, Click to exit. Multi-blast: Click or Clash to exit.</p>
+<p class="tip">Turn means roll the whole saber on its long axis (page {P['motion']}). Scroll presets: turn, Click to select. Volume: turn, Click to exit. Multi-blast: Click or Clash to exit.</p>
 <div class="pn">&lt; {pn} &gt;</div></div>"""
 
 
@@ -621,7 +621,7 @@ def page_color(pn):
            f'{dots}{blade_h(224 - FADE_L, 224, lit=True, fade=True, color="purple")}{hz("top-mini", "body-mini", dx=180)}{twist}</svg>')
     steps = [
         "With the blade on, point it parallel or down and press 4 Clicks. Color change starts",
-        "Turn the hilt like a dial. The blade steps through the colors",
+        "Hold the blade level and roll the whole saber on its long axis. The blade steps through the colors",
         "Click to save the color. Long Click to cancel and keep the old one",
     ]
     body = "".join(f'<div class="step">{num(i)}<div><p>{sent(t)}</p></div></div>' for i, t in enumerate(steps, 1))
@@ -669,7 +669,7 @@ def page_motion(pn):
          '<path class="arrow" data-head="1" d="M300 154H140"/>' + burst(-32, 98)),
         ("Swing", "A firm swing. Hold Power and swing for multi-blast mode",
          '<path class="arrow" data-head="1" d="M440 50Q240 6 40 50"/>'),
-        ("Turn right / left", "Rotate the hilt like a dial, a step at a time. The menus for presets, volume, color and music use it", twist),
+        ("Turn right / left", "Roll the whole saber on its long axis with the blade level. Each step is about 30°. Nothing unscrews. The menus for presets, volume, color and music use it", twist),
         ("Gesture ignition", f"Swing, stab, twist or thrust to ignite, if your saber has gestures turned on. Hold Power + Clash pointing down turns gestures on or off.{TODO}",
          '<path class="arrow" data-head="1" d="M300 46H140"/>' + twist),
     ]
@@ -1373,6 +1373,7 @@ def page_edit(pn):
 <p>Edit Mode is a spoken menu for changing fonts, colors, blade length, timings and volume on the saber. It needs the menu voice files on the SD card.</p>
 {sub("Blade off: Double Click and Hold to enter", "#E44F44")}
 {ctl_table(rows)}
+<p class="tip">Turn means roll the whole saber on its long axis, blade level (page {P['motion']}).</p>
 <p class="tip">Some sabers open a shorter Edit Settings menu instead, with the same controls.{TODO}</p>
 <div class="pn">&lt; {pn} &gt;</div></div>"""
 
