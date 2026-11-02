@@ -188,7 +188,7 @@ pre code { display: block } pre .c { color: #7f7f7f }
 .acc .pic { height: 15mm; display: flex; align-items: flex-end; justify-content: center }
 .acc img { max-width: 100%; object-fit: contain }
 .acc figure:nth-child(n+4) .pic { height: 34mm }  /* second row: the stands, larger */
-.acc .pic.wallmount { align-items: center }  /* level with the middle of the floating stand */
+.acc .pic.cable { align-items: center }  /* level with the middle of the floating stand */
 .acc b { display: block; font-size: var(--body); line-height: 1.3; color: #D4D4D4; margin-bottom: .6mm }
 .acc p { font-size: var(--small); line-height: 1.35; color: #A8A8A8 }
 .arch rect { fill: #131313; stroke: #3a3a3a } .arch text { fill: #D4D4D4; font-family: Poppins; text-anchor: middle } .arch .s { fill: #8f8f8f }
@@ -1019,7 +1019,7 @@ ACCESSORIES = [  # (QR key, image, height in mm: rough relative size, name, desc
     ("plug", "plug", 11.2, "Blade Plug", "Fits into the blade socket of a hilt when the blade is removed to protect the internal components from dust and debris"),
     ("clip", "clip", 9, "Covertec Belt Clip", "Hang your saber with the Covertec hook and belt clip; fits belts up to 3.5 cm wide"),
     ("pokr", "core", 15, "PO x KR Sabers Core", "Next-generation saber core for unbeatable sound performance: deeper bass, richer tones, and vibration that resonates through the hilt"),
-    ("wallmount", "wallmount", 15, "Wall Mount", "A simple mount that holds your hilt horizontally on the wall, turning any room into a lightsaber showcase"),
+    ("cable", "cable", 22, "Low Profile Micro USB Data Cable", "Connect to hard-to-access saber boards to program the Proffie core, update the OS, etc."),
     ("stand", "stand", 13, "Display Stand", "The durable construction ensures your saber remains securely supported, offering peace of mind while on display"),
     ("floating", "floating", 34, "Floating Display", "Holds your hilt magnetically, so the saber hangs free, floats, and turns on its own axis")]
 
@@ -1326,7 +1326,6 @@ QR_URLS = {"gallery": "https://gv.videocdn.alibaba.com/icbu_vod_video/video_targ
            "plug": "https://padawanoutpost.com/products/blade-plugs?variant=37207185260702",
            "clip": "https://padawanoutpost.com/products/covertec-hook-belt?variant=42903202922738",
            "pokr": "https://padawanoutpost.com/products/po-x-kr-core?variant=55788716556670",
-           "wallmount": "https://padawanoutpost.com/products/saber-wall-mounts?variant=44233505308914",
            "stand": "https://saberlight.com.au/en-uk/products/display-stand-with-nameplate?variant=47230761402537",
            "floating": "https://padawanoutpost.com/products/floating-lightsaber-display-stand?variant=58171560460670"}
 QR_VERSION = 8  # the longest URL (gallery) needs version 8 at level M; every code uses it, so every module is the same size
