@@ -17,10 +17,9 @@ GREEN = "#44B03D"
 
 
 def sent(t):
-    """Full sentences end with a period; a trailing confirm tag stays after it."""
+    """Full sentences end with a period."""
     t = t.rstrip()
     return t if t.endswith((".", "?", "!", "</span>")) else t + "."
-TODO = '<span class="todo">confirm</span>'
 
 
 def num(n):
@@ -105,7 +104,6 @@ h1 .h1-sub { font: 500 var(--sub)/1 Poppins, sans-serif; letter-spacing: .02em; 
 .mo svg * { vector-effect: non-scaling-stroke }
 .mo b { display: block; font-size: var(--body); line-height: 1.3 }
 .mo span { display: block; font-size: var(--small); line-height: 1.4; color: #A0A0A0 }
-.mo span.todo { display: inline-block; color: #0E0E0E }
 /* troubleshooting */
 .qa { display: flex; gap: 1.8mm; padding: 1.8mm 0; border-bottom: .5pt solid #3a3a3a }
 .qa b { display: block; font-size: var(--body); line-height: 1.3; margin-bottom: .5mm }
@@ -182,13 +180,12 @@ pre code { display: block } pre .c { color: #7f7f7f }
 .links { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm 4mm }
 .links figure { margin: 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1.2mm; color: #D4D4D4; line-height: 1.3 }
 .links svg { width: 20mm; height: 20mm; border-radius: 1.4mm }
-.src { position: absolute; top: 6mm; right: 8mm; width: 14mm; text-align: center; font-size: var(--fine); line-height: 1 }
+.src { position: absolute; top: 5mm; right: 8mm; width: 14mm; text-align: center; font-size: var(--fine); line-height: 1.2 } .src a { text-underline-offset: .25mm }
 .src svg { display: block; width: 14mm; height: 14mm; border-radius: 1mm; margin-bottom: .8mm }
 .links small { color: #8C8C8C; font-size: var(--small) }
 .arch rect { fill: #131313; stroke: #3a3a3a } .arch text { fill: #D4D4D4; font-family: Poppins; text-anchor: middle } .arch .s { fill: #8f8f8f }
 .toc .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 4mm } .toc .cols > div { min-width: 0 }
 .toc .cols a { font-size: var(--small) } .toc .cols a span:first-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
-.todo { display: inline-block; font: 600 var(--fine)/1.5 Poppins; color: #0E0E0E; background: #E44F44; border-radius: .8mm; padding: 0 .9mm; margin-left: 1mm; vertical-align: 1px }
 @media print { .ghost { display: none } html, body { background: #0E0E0E } .spread { display: block; width: auto; margin: 0 } .page { page-break-after: always; height: 491px } }
 """
 
@@ -235,7 +232,7 @@ def screw_art(kind, cx, cy, s):
     Returns the svg and the x of its left and right edges."""
     steel, edge, thr = "#c9cdd1", f'stroke="#141414" stroke-width="{.12 * s:.2f}"', "#8d9297"
     tw = f"{.1 * s:.2f}"  # thread line width
-    d, length, head, hh, pitch = {"set": (4, 5, 4, 0, .7), "csk": (3, 2.5, 6, 1.5, .5), "button": (3, 5, 5.7, 1.65, .5)}[kind]
+    d, length, head, hh, pitch = {"set": (4, 3, 4, 0, .7), "csk": (3, 2.5, 6, 1.5, .5), "button": (3, 5, 5.7, 1.65, .5)}[kind]
     g = 1.5  # gap between the views, mm
     w = 2 * head + g
     tx = cx - w * s / 2 + head * s / 2  # top view centre
@@ -291,7 +288,7 @@ def page_structure(pn):
     r = 7 * k
     lead = lambda d: f'<path class="lead" d="{d}" style="stroke-width:{.6 * k:.2f};stroke-dasharray:{1.6 * k:.2f} {1.6 * k:.2f}"/>'
     xl, xr = (v0 + 100 - RING_HW) / 2, (dx + 100 + RING_HW + v0 + vw) / 2
-    for kind, cx, cy, side, lines in (("set", xl, (hy + hy2) / 2, "L", ("M4 × 5 mm", "hex set screw")),
+    for kind, cx, cy, side, lines in (("set", xl, (hy + hy2) / 2, "L", ("M4 × 3 mm", "hex set screw")),
                                       ("button", xl, KNOB_Y, "L", ("M3 × 5 mm hex", "button head screw")),
                                       ("csk", xr, sy, "R", ("M3 × 4 mm hex", "countersunk screw"))):
         zoom = 2  # screws drawn at twice the hilt's scale, inside a circle
@@ -384,35 +381,47 @@ def page_core(pn):
                 f'H{cx + w(4):.1f}Q{cx + w(6):.1f} {y1:.1f} {cx + w(6):.1f} {y1 + w(2):.1f}V{y2:.1f}H{cx + w(2.8):.1f}L{cx + w(2):.1f} {y3:.1f}V{y4:.1f}Z" fill="#f4f4f2" stroke="#141414" stroke-width="1"/>'
                 f'<path d="M{cx - w(6):.1f} {y2:.1f}H{cx + w(6):.1f}" stroke="#b8b8b4" stroke-width=".8"/>')
 
-    def micro(x0, cy):
-        """The black right-angle Micro-USB plug, side on, tip pointing left, cable going down (photo, mirrored)."""
-        P = lambda pts: "M" + "L".join(f"{x0 + x * u:.1f} {cy + y * u:.1f}" for x, y in pts) + "Z"
-        R = lambda x, y, wd, ht, r, fill, extra="": (f'<rect x="{x0 + x * u:.1f}" y="{cy + y * u:.1f}" width="{wd * u:.1f}" height="{ht * u:.1f}" rx="{r * u:.1f}" fill="{fill}" {extra}/>')
-        edge = 'stroke="#6b6e72" stroke-width=".8"'
-        return (R(12.9, 9, 2.6, 13, 0, "#1b1b1d", edge)  # cable
-                + f'<path d="{P([(12.4, 6.8), (16.2, 6.8), (15.8, 10.4), (12.8, 10.4)])}" fill="#1b1b1d" {edge}/>'  # strain relief
-                + f'<path d="{P([(6.2, -5.4), (18.6, -5.4), (18.6, 7), (8.8, 7), (8.8, 5.2), (6.2, 5.2)])}" fill="#202023" {edge} stroke-linejoin="round"/>'  # body, stepped up by the tip
-                + R(18.4, -6.1, 3.4, 15.8, .8, "#18181a", edge)  # flange
-                + R(0, -3.42, 6.6, 6.84, .3, "#c9cdd1", 'stroke="#141414" stroke-width=".8"')  # metal tip
-                + R(.4, -2.3, 3.3, .8, .3, "#2a2c30") + R(.4, 1.3, 3.3, .8, .3, "#2a2c30"))  # latch holes
     kc, (_, y2), (_, y8) = call_k(ART_H, 590), a(250, 194), b(268, 1044)
     r = 7 * kc
     lead = lambda d: f'<path class="lead" d="{d}" style="stroke-width:{.6 * kc:.2f};stroke-dasharray:{1.6 * kc:.2f} {1.6 * kc:.2f}"/>'
     vw = 69 * 590 / ART_H  # viewBox width that spans the page's text width
     v0 = 145 - vw / 2  # centred between the callout columns
-    ux = (v0 + x1) / 2  # USB-C: halfway from the page edge to the battery side
-    mx = (x2 + 311 * k2 + v0 + vw) / 2 - 10.9 * u  # Micro-USB: its middle halfway from the board side to the page edge
+    ux = x1 - 6 * u - 1.5 * (x1 - 6 * u - (v0 + x1) / 2)  # USB-C: 1.5 times its old gap (halfway to the page edge) from the battery side
+    mc = (x2 + 311 * k2 + v0 + vw) / 2  # Micro-USB: centred between the board side and the page edge
+
+    def micro(x0, cy):
+        """Low-profile Micro-USB plug, true scale, as in the Saber Armory photo (mirrored): plug face toward the
+        core on the left, oval steel flange behind it, flat ribbon cable going down and fading out."""
+        P = lambda pts: "M" + "L".join(f"{x0 + x * u:.1f} {cy + y * u:.1f}" for x, y in pts) + "Z"
+        R = lambda x, y, wd, ht, r, fill, extra="": (f'<rect x="{x0 + x * u:.1f}" y="{cy + y * u:.1f}" width="{wd * u:.1f}" height="{ht * u:.1f}" rx="{r * u:.1f}" fill="{fill}" {extra}/>')
+        edge = 'stroke="#141414" stroke-width=".8"'
+        fade = ('<defs><linearGradient id="g-rib" x1="0" y1="0" x2="0" y2="1"><stop offset=".55" stop-color="#1b1b1d"/><stop offset="1" stop-color="#1b1b1d" stop-opacity="0"/></linearGradient>'
+                '<linearGradient id="g-rib-edge" x1="0" y1="0" x2="0" y2="1"><stop offset=".55" stop-color="#6b6e72"/><stop offset="1" stop-color="#6b6e72" stop-opacity="0"/></linearGradient></defs>')
+        return (fade + R(4, 2.5, 5, 19.5, 0, "url(#g-rib)", 'stroke="url(#g-rib-edge)" stroke-width=".8"')  # ribbon, 5 mm wide
+                + R(2.2, -3.6, 11, 7.2, 3.4, "url(#g-usb)", edge)  # flange
+                + R(3.6, -2.6, 8.2, 1.1, .5, "#2a2c30")  # slot in the flange
+                + f'<path d="{P([(0, -.6), (6.85, -.6), (8.6, -2), (1.75, -2)])}" fill="#b8bcc0" {edge} stroke-linejoin="round"/>'  # top of the plug
+                + R(0, -.6, 6.85, 3, .5, "#d6d9dc", edge)  # plug face, 6.85 mm
+                + f'<path d="{P([(.8, .1), (6.05, .1), (5.45, 1.6), (1.4, 1.6)])}" fill="#141414"/>'  # socket mouth
+                + "".join(R(1.75 + i * .8, .25, .45, .45, .2, "#c9a646") for i in range(5)))  # pins
+    mx = x2 + 311 * k2 + 1.5 * (mc - 6.6 * u - x2 - 311 * k2)  # 1.5 times its old gap (centred) from the board side
+    mc = mx + 6.6 * u
+    ly = y8 + 22 * u + 20  # caption under the cable, then the shop link in small type
+    cy2 = ly + 1.15 * 5.6 / 72 * 25.4 * 590 / ART_H + 48
+    shop = (f'<text x="{mc:.1f}" y="{cy2:.1f}" data-pt="5" font-family="Poppins" fill="#A8A8A8" text-anchor="middle">e.g.: from'
+            f'<a href="{QR_URLS["cable"]}"><tspan x="{mc:.1f}" dy="1.3em" text-decoration="underline">The Saber Armory</tspan></a></text>')
     svg += (usbc(ux, y2 - r) + lead(f"M{-4 - r:.1f} {y2}H{ux + 4.125 * u:.1f}") + f'<text x="{ux}" y="{y2 - r + 43 * u + 20:.0f}" class="cap">USB-C<tspan x="{ux}" dy="1.15em">cable</tspan></text>'
-            + micro(mx, y8) + lead(f"M{294 + r:.1f} {y8}H{mx}") + f'<text x="{mx + 10.9 * u:.0f}" y="{y8 + 22 * u + 20:.0f}" class="cap">Micro-USB<tspan x="{mx + 10.9 * u:.0f}" dy="1.15em">cable</tspan></text>')
+            + micro(mx, y8) + lead(f"M{294 + r:.1f} {y8}H{mx:.1f}")
+            + f'<text x="{mc:.1f}" y="{ly:.0f}" class="cap">Low profile Micro<tspan x="{mc:.1f}" dy="1.15em">USB data cable</tspan></text>' + shop)
     legend = "".join(f'<div>{num(n)}{label}</div>' for n, *_, label in calls)
-    return f"""<div class="page">{src_qr("core")}<h1>Core<small class="h1-sub">NexusSabers LGT A.294-1</small></h1>
-<svg viewBox="{v0:.1f} -4 {vw:.1f} 590" class="art" style="height:{ART_H}mm;width:100%;margin-bottom:0">
+    return f"""<div class="page">{src_qr("core", "NexusSabers LGT A.294-1")}<h1>Core<small class="h1-sub">NexusSabers LGT A.294-1</small></h1>
+<svg viewBox="{v0:.1f} -4 {vw:.1f} 590" class="art" style="height:{ART_H}mm;width:100%;margin-bottom:0;overflow:visible">
 <g transform="translate({x1} 0) scale({k1:.5f})">{core_battery_side()}</g>
 <g transform="translate({x2} 0) scale({k2:.5f})">{core_board_side()}</g>{svg}
 <text x="{x1 + 53}" y="580" class="cap">Battery side</text><text x="{x2 + 52}" y="580" class="cap">Board side</text></svg>
 <div class="legend">{legend}</div>
 <p class="tip">The microSD card (7) slides into a slot under the board (9), below the Micro-USB data port (8).</p>
-<p class="tip">The Micro-USB data port (8) takes a data cable, not a charging cable. The port sits close to the chassis (12) and doesn't fit most plugs. Use a right-angle plug like the one shown.</p>
+<p class="tip">The Micro-USB data port (8) takes a data cable, not a charging cable. The port sits close to the chassis (12) and doesn't fit most plugs. Use a low-profile plug like the one shown.</p>
 <p class="tip">The power switch (11) is a push button that cuts the battery (4) off from the board. Click it off to store the saber. If the saber stops responding, click it off, then on.</p>
 <div class="pn">&lt; {pn} &gt;</div></div>"""
 
@@ -687,8 +696,6 @@ def page_motion(pn):
         ("Swing", "A firm swing. Hold Power and swing for multi-blast mode",
          '<path class="arrow" data-head="1" d="M440 50Q240 6 40 50"/>'),
         ("Turn right / left", "Roll the whole saber on its long axis with the blade level. Each step is about 30°. Nothing unscrews. The menus for presets, volume, color and music use it", twist),
-        ("Gesture ignition", f"Swing, stab, twist or thrust to ignite, if your saber has gestures turned on. Hold Power + Clash pointing down turns gestures on or off.{TODO}",
-         '<path class="arrow" data-head="1" d="M300 46H140"/>' + twist),
     ]
     body = "".join(f'<div class="mo">{mini(art)}<div><b>{t}</b><span>{sent(d)}</span></div></div>' for t, d, art in rows)
     body += (f'<div class="mo">{dial("height:13mm")}<div><b>Like a dial</b><span>Point the blade away from you and look at the pommel. '
@@ -1191,8 +1198,8 @@ def page_blade(pn):
         cells += (f'<image href="img/{f}.png" x="{x}" y="0" width="{pw}" height="{ph}"/>'
                   + callout_v(n, -2.2 * u, x + tx, ty, k=CALL_MM * u / 7))
     photos = f'<svg viewBox="0 {-3.6 * u:.0f} {4 * pw + 3 * gap} {ph + 3.6 * u:.0f}" class="bphotos">{cells}</svg>'
-    return f"""<div class="page">{src_qr("blade")}<h1>Blade<small class="h1-sub">NexusSabers A207-1<br>Neopixel<br>heavy-dueling blade</small></h1>
-<div class="blade-pg">{art}<div><p style="margin-top:3mm">ProffieOS sends a data signal up the strips, and each LED sets its own color.</p>
+    return f"""<div class="page">{src_qr("blade", "NexusSabers LGT A207-1")}<h1>Blade<small class="h1-sub">NexusSabers A207-1<br>Neopixel<br>heavy-dueling blade</small></h1>
+<div class="blade-pg">{art}<div><p style="margin-top:6mm">ProffieOS sends a data signal up the strips, and each LED sets its own color.</p>
 {photos}
 <div class="parts">{body}</div></div></div>
 <div class="pn">&lt; {pn} &gt;</div></div>"""
@@ -1280,7 +1287,7 @@ def page_specs(pn):
 
 def page_box(pn):
     items = [("Hilt", "with Proffie core"), ("Blade", "32 in (81 cm)"), ("USB-C cable", ""),
-             ("Hex key and spare screws", "The 5 mm screws hold the blade")]
+             ("Hex key and spare screws", "The 3 mm screws hold the blade")]
     body = "".join(f"<div>{a}{f'<small>{b}</small>' if b else ''}</div>" for a, b in items)
     videos = [("gallery", "Product video", "0:30",
                "The core lighting up, then the blade going in and the saber lit"),
@@ -1300,7 +1307,8 @@ QR_URLS = {"gallery": "https://gv.videocdn.alibaba.com/icbu_vod_video/video_targ
            "styleeditor": "https://fredrik.hubbe.net/ProffieOS-StyleEditor/style_editor.html",
            "workbench": "https://profezzorn.github.io/lightsaber-web-bluetooth/app.html", "github": "https://github.com/profezzorn/ProffieOS",
            "core": "https://www.alibaba.com/product-detail/Proffie-V2-2-Pogo-Core-Accent_1601792428062.html",
-           "blade": "https://www.alibaba.com/product-detail/LGT-Heavy-Dueling-1inch-3mm-92cm_1601574174450.html"}
+           "blade": "https://www.alibaba.com/product-detail/LGT-Heavy-Dueling-1inch-3mm-92cm_1601574174450.html",
+           "cable": "https://thesaberarmory.com/products/low-profile-micro-usb-data-transfer-cable-20cm"}
 QR_VERSION = 8  # the longest URL (gallery) needs version 8 at level M; every code uses it, so every module is the same size
 
 
@@ -1314,9 +1322,9 @@ def qr(name):
     return re.sub(r' width="[^"]*" height="[^"]*"', "", svg, count=1)
 
 
-def src_qr(name):
+def src_qr(name, label):
     """Small QR to a part's listing, top right of the page, with a text link under it."""
-    return f'<div class="src">{qr(name)}{link("Alibaba", QR_URLS[name])}</div>'
+    return f'<div class="src">{qr(name)}{link(label, QR_URLS[name])}</div>'
 
 
 def link(text, url=None):
@@ -1366,7 +1374,7 @@ def page_quickstart(pn):
             f'<circle cx="{zx}" cy="{zy}" r="{rc}" fill="#161616" stroke="#3a3a3a" stroke-width="1"/>{art}'
             f'<text x="{zx - rc - 4}" y="{zy + rc * .85:.1f}" data-pt="4.6" font-family="Poppins" fill="#6a6a6a" text-anchor="end">2:1</text>'
             f'<text x="{zx + rc + 8}" y="{zy + 6}" class="cap" style="text-anchor:start">2x</text>'
-            f'<text x="{zx + rc + 42}" y="{zy - 3}" data-pt="5" font-family="Poppins" fill="#A8A8A8">M4 × 5 mm<tspan x="{zx + rc + 42}" dy="1.2em">hex set screw</tspan></text>')
+            f'<text x="{zx + rc + 42}" y="{zy - 3}" data-pt="5" font-family="Poppins" fill="#A8A8A8">M4 × 3 mm<tspan x="{zx + rc + 42}" dy="1.2em">hex set screw</tspan></text>')
     vb3 = view(0, 128)  # taller: room for the zoom circle
     s3 = f'<svg {vb3}>{blade_in}{hilt}{zoom}</svg>'
     # 4: blade in, the power button ringed
@@ -1376,7 +1384,7 @@ def page_quickstart(pn):
     s4 = f'<svg {vb}>{blade_in}{hilt}{ring}</svg>'
     steps = [(f"Charge to full (page {P['charging']}). The first charge takes a few hours", s1),
              ("Push the blade all the way into the emitter", s2),
-             ("Tighten the two 5 mm screws with the hex key until snug", s3),
+             ("Tighten the two 3 mm screws with the hex key until snug", s3),
              ("Click Power to ignite. Hold Power to turn off. Long Click to try the other presets", s4)]
     body = "".join(f'<div class="step">{num(i)}<div><p>{sent(t)}</p>{d}</div></div>' for i, (t, d) in enumerate(steps, 1))
     return f"""<div class="page qstart nosep"><h1>Quick start</h1>{body}<div class="pn">&lt; {pn} &gt;</div></div>"""
@@ -1393,7 +1401,6 @@ def page_edit(pn):
 {sub("Blade off: Double Click and Hold to enter", "#E44F44")}
 {ctl_table(rows)}
 <p class="tip">Turn means roll the whole saber on its long axis, blade level (page {P['motion']}).</p>
-<p class="tip">Some sabers open a shorter Edit Settings menu instead, with the same controls.{TODO}</p>
 <div class="pn">&lt; {pn} &gt;</div></div>"""
 
 
