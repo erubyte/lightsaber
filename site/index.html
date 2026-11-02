@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quinlan Vos Lightsaber Manual</title>
+<meta name="description" content="Free product manual for the Quinlan Vos combat lightsaber with a Proffie V2.2 core: read it online or print it as an A4 booklet.">
+<meta property="og:title" content="Quinlan Vos Lightsaber Manual">
+<meta property="og:description" content="Free product manual for the Quinlan Vos combat lightsaber with a Proffie V2.2 core.">
+<meta property="og:image" content="cover.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --ink: #111111; --text: #333333; --muted: #5e5e5e; --line: #d0d0d0; --panel: #f4f4f4; --red: #E44F44; --green: #44B03D }
+  * { box-sizing: border-box }
+  html, body { margin: 0; background: #ffffff; color: var(--text); font: 16px/1.5 Poppins, system-ui, sans-serif }
+  main { max-width: 960px; margin: 0 auto; padding: 24px 16px 40px; display: grid; gap: 24px; align-items: center }
+  .cover { display: block; width: 100%; max-width: 440px; height: auto; margin: 0 auto; border: 1px solid var(--line); border-radius: 6px }
+  .logo { display: block; width: 140px; height: auto; margin: 0 0 14px }
+  h1 { font: 800 clamp(22px, 5vw, 30px)/1.15 Orbitron, sans-serif; letter-spacing: .05em; text-transform: uppercase; color: var(--ink);
+       margin: 0 0 6px; display: flex; align-items: center; gap: 10px }
+  h1::before { content: ""; flex: none; width: 5px; height: .9em; border-radius: 3px; background: var(--red) }
+  .model { margin: 0 0 20px 15px; color: var(--muted) }
+  .btns { display: grid; gap: 12px }
+  .btn { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 12px 20px; border-radius: 8px;
+         font: 500 16px Poppins, sans-serif; text-decoration: none; transition: background-color .15s, border-color .15s }
+  .btn svg { width: 20px; height: 20px; flex: none }
+  .primary { background: var(--ink); color: #ffffff }
+  .primary:hover { background: #333333 }
+  .secondary { border: 1.5px solid var(--ink); color: var(--ink) }
+  .secondary:hover { background: var(--panel) }
+  .btn:focus-visible { outline: 3px solid var(--green); outline-offset: 3px }
+  .how { margin: 8px 0 0; padding-left: 12px; border-left: 3px solid var(--green); color: var(--muted); font-size: 14px }
+  @media (min-width: 760px) { main { grid-template-columns: 1fr 1fr; gap: 48px; padding-top: 48px } }
+  @media (prefers-reduced-motion: reduce) { .btn { transition: none } }
+</style>
+</head>
+<body>
+<main>
+  <img class="cover" src="cover.webp" width="875" height="1240" alt="Cover of the Combat Lightsaber Model Quinlan Vos product manual, with the lit green saber">
+  <div>
+    <img class="logo" src="logo.webp" width="486" height="208" alt="Padawan Outpost">
+    <h1>Product Manual</h1>
+    <p class="model">Combat Lightsaber<br>Model: Quinlan Vos (Proffie v2.2)</p>
+    <div class="btns">
+      <a class="btn primary" href="quinlan-vos-manual-a5.pdf" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+        Read online</a>
+      <a class="btn secondary" href="quinlan-vos-manual-booklet-a4.pdf" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+        Download print booklet</a>
+    </div>
+    <p class="how">The booklet prints on A4. Print double-sided, flip on the short edge, then fold and staple.</p>
+  </div>
+</main>
+</body>
+</html>
