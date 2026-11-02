@@ -183,6 +183,14 @@ pre code { display: block } pre .c { color: #7f7f7f }
 .src { position: absolute; top: 5mm; right: 8mm; width: 14mm; text-align: center; font-size: var(--fine); line-height: 1.2 } .src a { text-underline-offset: .25mm }
 .src svg { display: block; width: 14mm; height: 14mm; border-radius: 1mm; margin-bottom: .8mm }
 .links small { color: #8C8C8C; font-size: var(--small) }
+.acc { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5mm 3mm }
+.acc figure { margin: 0; display: flex; flex-direction: column; gap: 1.5mm; text-align: center }
+.acc .pic { height: 15mm; display: flex; align-items: flex-end; justify-content: center }
+.acc img { max-width: 100%; object-fit: contain }
+.acc figure:nth-child(n+4) .pic { height: 34mm }  /* second row: the stands, larger */
+.acc .pic.wallmount { align-items: center }  /* level with the middle of the floating stand */
+.acc b { display: block; font-size: var(--body); line-height: 1.3; color: #D4D4D4; margin-bottom: .6mm }
+.acc p { font-size: var(--small); line-height: 1.35; color: #A8A8A8 }
 .arch rect { fill: #131313; stroke: #3a3a3a } .arch text { fill: #D4D4D4; font-family: Poppins; text-anchor: middle } .arch .s { fill: #8f8f8f }
 .toc .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 4mm } .toc .cols > div { min-width: 0 }
 .toc .cols a { font-size: var(--small) } .toc .cols a span:first-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
@@ -274,7 +282,7 @@ def page_structure(pn):
         (3, "L", (hy + hy2) / 2, [(hx, hy), (hx2, hy2)], "Blade retention screws"),
         (4, "L", BUTTON_Y, [(100 - BUTTON_R - t, BUTTON_Y)], "Power button"),
         (5, "L", cu, [(100 - HW(133) - t, cu)], "Crystal chamber"),
-        (6, "L", JOINT_Y, [(L + 3, JOINT_Y)], "Joint (also unscrews)"),
+        (6, "L", JOINT_Y, [(L + 3, JOINT_Y)], "Joint"),
         (7, "L", KNOB_Y, [(100 - KNOB_R - t, KNOB_Y)], "Covertec wheel (belt clip mount)"),
         (8, "R", 420, [(px, py - POMMEL_R + 4)], "Pommel, sound holes"),
         (9, "R", sy, [(sx + dx, sy)], "Sleeve screw"),
@@ -313,7 +321,7 @@ def page_structure(pn):
 {pommel_end(px, py, shaded=True)}<path class="lead" d="M{dx + 100 + POMMEL_R + 4} 511Q{px} 511 {px} {py + POMMEL_R + 2}"/>{svg}
 <text x="100" y="538" class="cap">Front</text><text x="{dx + 100}" y="538" class="cap">Back</text></svg>
 <div class="legend">{legend}</div>
-<p class="tip">The Covertec wheel slides into a Covertec belt clip, which you buy on its own, so the hilt hangs from a belt. Remove the blade first.</p><div class="pn">&lt; {pn} &gt;</div></div>"""
+<p class="tip">The Covertec wheel slides into a Covertec belt clip (sold separately), so the hilt hangs from a belt. Remove the blade before hanging.</p><div class="pn">&lt; {pn} &gt;</div></div>"""
 
 
 def page_anatomy(pn):
@@ -339,11 +347,11 @@ def page_anatomy(pn):
     calls = [(1, (CX - 10, apex + 300)), (2, (CX - RING_HW, (RING[0] + BLACK[0]) / 2)), (3, (CX - 26, 220)),
              (4, (CX - cdx - CORE_D / 2, (c0 + c1) / 2)), (5, (CX - POMMEL_R, (POMMEL + END_Y) / 2))]
     svg = "".join(callout(n, "L", t[1], t, cx=cx, k=call_k(hmm, h)) for n, t in calls)
-    terms = [("Blade", "A polycarbonate tube with Neopixel LED strips. It's 81 cm long"),
-             ("Emitter", "The top of the hilt. Two screws hold the blade in it"),
-             ("Hilt", "The metal handle. It's 31 cm long and unscrews at the joint and at the pommel"),
-             ("Core", f"The removable electronics: board, battery and speaker. It sits in the lower half of the hilt (page {P['core']})"),
-             ("Pommel", "The bottom cap. Sound comes out through its holes, and it unscrews to take the core out")]
+    terms = [("Blade", "A polycarbonate tube with Neopixel LED strips (81 cm long)"),
+             ("Emitter", "The top of the hilt. The blade is held in the emitter by two screws"),
+             ("Hilt", "The metal handle (31 cm long); unscrews at the joint and at the pommel"),
+             ("Core", f"A gold chassis which contains the board, battery and speaker. It sits inside the hilt (page {P['core']})"),
+             ("Pommel", "The bottom cap. Sound is emitted through its holes. It can be unscrewed to take out the core")]
     body = "".join(f'<div class="part">{num(n)}<div><b>{a}</b>{sent(b)}</div></div>' for n, (a, b) in enumerate(terms, 1))
     wmm = w / u
     return f"""<div class="page"><h1>Anatomy</h1>
@@ -464,9 +472,9 @@ def page_charging(pn):
           f'<path class="arrow" data-head="1" d="M{sm - 100} 60H{sm - 40}"/></g></svg>')
     s4 = f'<div class="duo">{plugged("#ff3b30", "Charging")}{plugged("#3cd86a", "Full")}</div>'
     return f"""<div class="page nosep"><h1>Charging</h1>
-<div class="step">{num(1)}<div><p>Hold the grip and turn the pommel at the bottom counterclockwise to unscrew it.</p>{s1}</div></div>
-<div class="step">{num(2)}<div><p>Pull the pommel off.</p>{s2}</div></div>
-<div class="step">{num(3)}<div><p class="last-right">Tilt the hilt so its open bottom points down. The gold core slides out, speaker end first.</p>{s3}</div></div>
+<div class="step">{num(1)}<div><p>Hold the grip and turn the pommel counterclockwise to unscrew.</p>{s1}</div></div>
+<div class="step">{num(2)}<div><p>Take the pommel off.</p>{s2}</div></div>
+<div class="step">{num(3)}<div><p class="last-right">Tilt the hilt to slide out the core.                                                               </p>{s3}</div></div>
 <div class="step">{num(4)}<div><p>Plug a USB-C cable into the port next to the gold pins. Use a 5V 1A charger only. The light by the speaker shows red while charging and green when full.</p>{s4}</div></div>
 <div class="step">{num(5)}<div><p>Slide the core back in, gold pins first, then screw the pommel back on.</p></div></div>
 <p class="note">The hilt also unscrews at the joint below the crystal chamber, which frees the core from the top instead.</p>
@@ -502,9 +510,9 @@ def page_button(pn):
         ("Triple Click + Long Click", "Three short presses, then a long click", "cccl"),
     ]
     body = "".join(f'<div class="press"><div><b>{t}</b><span>{d}</span></div>{pulses(k)}</div>' for t, d, k in rows)
-    return f"""<div class="page"><h1>The button</h1>
+    return f"""<div class="page"><h1>Power button</h1>
 <div class="pwr"><svg viewBox="0 0 30 30" style="width:6.5mm;height:6.5mm;flex:none"><circle cx="15" cy="15" r="13" fill="none" stroke="#D6D6D6" stroke-width="1"/><circle cx="15" cy="15" r="10" fill="#E44F44"/></svg>
-<p>The red button is the Power button. You give each command as a pattern of presses on it.</p></div>
+<p>The red button is the Power button. Power button press patterns indicate different commands.</p></div>
 {body}<div class="pn">&lt; {pn} &gt;</div></div>"""
 
 
@@ -532,7 +540,7 @@ def page_angle(pn):
                                         (58, 250, "Down", "#f0a39d")))
     fan = f'<svg viewBox="-2 -6 204 270" class="art" style="height:58mm">{zones}{fan_hilt(90, px, py)}{fan_hilt(0, px, py)}{fan_hilt(-90, px, py)}{labels}<circle cx="{px}" cy="{py}" r="3" fill="#E44F44"/></svg>'
     return f"""<div class="page"><h1>Blade angle</h1>
-<p>Some presses do different things depending on where the blade points. Down means steeper than 60° below level. Straight up means steeper than 60° above.</p>
+<p>Some presses do different things depending on where the blade points. Down is steeper than 60° below level; straight up is steeper than 60° above.</p>
 {fan}
 <table class="tbl ang"><tr><th>Press</th><th>Parallel or up</th><th>Down</th></tr>
 <tr><td>Long Click</td><td>Next preset</td><td>Previous preset</td></tr>
@@ -567,7 +575,7 @@ def page_controls(pn):
     return f"""<div class="page"><h1>Control</h1>
 <div class="ref"><div>{sub("Blade off", "#E44F44")}{col(off)}</div><div>{sub("Blade on", GREEN)}{col(on)}</div></div>
 <p class="tip">↑ parallel or up · ↓ down · ↑↑ straight up</p>
-<p class="tip">Turn means roll the whole saber on its long axis (page {P['motion']}). Scroll presets: turn, Click to select. Volume: turn, Click to exit. Multi-blast: Click or Clash to exit.</p>
+<p class="tip">Turn means roll the whole saber on its long axis (page {P['motion']}).                           Scroll presets: turn, Click to select. Volume: turn, Click to exit. Multi-blast: Click or Clash to exit.</p>
 <div class="pn">&lt; {pn} &gt;</div></div>"""
 
 
@@ -769,7 +777,7 @@ def page_proffie(pn):
             ("SD card", "Sound fonts, music, quotes, menu voice", "Copy files"),
             ("Saved settings, on the SD card", "Edit Mode changes: font, color, timings", "On the saber")]
     body = "".join(f"<tr><td>{a}</td><td>{b}</td><td>{c}</td></tr>" for a, b, c in rows)
-    return f"""<div class="page"><h1>What is Proffie</h1>
+    return f"""<div class="page"><h1>The Proffie Core</h1>
 <p>Proffie is this saber's board and the software it runs: the Proffieboard and ProffieOS. Fredrik Hübinette designed both, and the name comes from his nickname, Profezzorn.</p>
 <p>Anyone can read, change and share ProffieOS under the GPLv3 license, and Fredrik publishes the board's design files. You can reprogram this saber yourself.</p>
 {sub("Where things live", GREEN)}
@@ -796,17 +804,6 @@ def page_change(pn):
 {sub("Ideas for this saber", GREEN)}
 <table class="tbl spec ideas"><tr><th>Idea</th><th>Step</th></tr>{ideas}</table>
 <p class="tip">Back up the SD card and the config before changing anything in the code (page {P['backup']}).</p>
-<div class="pn">&lt; {pn} &gt;</div></div>"""
-
-
-def page_vs(pn):
-    rows = [("Software", "Closed", "Open source, GPLv3"), ("Board design", "Closed", "Open hardware, design files published"),
-            ("Blade effects", "A fixed list", "Any effect you can code"), ("Buttons and gestures", "Fixed", "A prop file you can rewrite"),
-            ("Sounds", "Played on cue", "Switched and triggered by blade code"), ("Updates", "From the maker", "Free, from the community")]
-    body = "".join(f"<tr><td>{a}</td><td>{b}</td><td>{c}</td></tr>" for a, b, c in rows)
-    return f"""<div class="page"><h1>Proffie vs others</h1>
-<p>Other sabers use the same kind of LEDs, battery and speaker, but their makers keep the code closed.</p>
-<table class="tbl ang" style="margin-top:3mm"><tr><th></th><th>Most sabers</th><th>Proffie</th></tr>{body}</table>
 <div class="pn">&lt; {pn} &gt;</div></div>"""
 
 
@@ -839,28 +836,14 @@ def page_parts(pn):
     art = (f'<svg viewBox="0 0 640 192" class="art" style="margin-top:4mm">'
            f'<g transform="translate(0 {up})">{fade_end(blade_h(-60, e + 4, lit=True, fade=True))}{hz("top-mini", "body-mini", dx=dx)}</g>'
            f'{guides}<g transform="translate(0 {dn})">{hz("core-mini", dx=dx)}</g>{calls}</svg>')
-    parts = [("Blade", "A polycarbonate tube with two LED strips inside, back to back. Each LED holds its own red, green and blue light and a tiny chip, so it can show any color on its own. The board sends a stream of colors up the strips and changes them to make the blade grow from the hilt or flicker like fire"),
-             ("Pogo pins", "Spring-loaded contacts at both joints, so the blade and the core connect without plugs or wires"),
-             ("Hilt", "The metal shell. It holds the button and the wires between the two joints. The rest of the electronics sit in the core"),
+    parts = [("Blade", "A polycarbonate tube with two LED strips inside, back to back. Each LED holds its own red, green and blue light and a tiny chip, so it can show any color on its own. The board sends a stream of colors up the strips and changes them to make the blade grow from the hilt or flicker"),
+             ("Pogo pins", "Spring-loaded contacts at both joints which allow the blade and the core to connect without plugs or wires"),
+             ("Hilt", "The metal shell. It holds the Power button and the wires between the two joints. The rest of the electronics sit in the core"),
              ("Core", f"One removable unit: board, battery, speaker, charging port and accent LEDs (page {P['core']})")]
     body = "".join(f'<div class="qa">{num(i)}<div><b>{a}</b><p>{sent(b)}</p></div></div>' for i, (a, b) in enumerate(parts, 1))
     return f"""<div class="page"><h1>How it fits together</h1>
 <p>A saber is a blade, a hilt and a core. The core slides out of the hilt, and the board inside it controls the light and the sound.</p>{art}{body}
 <p class="note">The board is the circuit board inside the core, also called the sound board. It runs the software, so it sets the sounds, blade effects and controls. Lightsabers are typically named after the board type they use; a Proffie saber is a lightsaber with a Proffieboard core.</p>
-<div class="pn">&lt; {pn} &gt;</div></div>"""
-
-
-def page_fits(pn):
-    qa = [("A Xenopixel core fits this hilt", "Padawan Outpost sells this model with a Xenopixel V3 or a Proffie V2.2 core. Both are the same pogo core size and drive the same blade"),
-          ("Xenopixel and Proffie share blades", "Any 1 in Neopixel blade with a three-ring contact disc works with either board"),
-          ("A baselit core needs another emitter", "A baselit core shines its own LED up a hollow blade, and this emitter holds the pin connector for a Neopixel blade"),
-          ("A baselit blade stays dark", "It fits, but a hollow blade has no LEDs, and this hilt has no LED to shine into it"),
-          ("Other pogo cores need the same format", "The core must be 1 in wide, with the same length and pin layout. LGT, Nexus and DamienSaber hilts share it. Check with the seller for other brands"),
-          ("You can swap the board alone", "It takes soldering. The board comes out of the core, and the battery and speaker stay"),
-          ("Your settings stay with the old core", f"Fonts and presets live on its SD card and board. Copy the card first (page {P['backup']})")]
-    body = "".join(f'<div class="qa"><div><b>{q}</b><p>{sent(a)}</p></div></div>' for q, a in qa)
-    return f"""<div class="page"><h1>What fits what</h1>{body}
-<p class="tip">A store that lists a core for Baselit, Xenopixel V3 and Proffie V2.2 hilts sells three versions, one per board. For this saber, choose the Proffie V2.2 version. Padawan Outpost lists this hilt as PO x KR core compatible.</p>
 <div class="pn">&lt; {pn} &gt;</div></div>"""
 
 
@@ -923,7 +906,7 @@ def page_backup(pn):
     body = steps(["Copy the whole SD card to your computer, including the .ini and .tmp files. They hold your Edit Mode changes",
                   "Find the config file: a .h file on the card, or inside a ProffieOS zip. If it's missing, ask DamienSaber for it. The board can't give it back",
                   f"Save the firmware. In Chrome, open {link('profezzorn.github.io/webdfu/dfu-util', 'https://profezzorn.github.io/webdfu/dfu-util/')}, send <code>RebootDFU</code> over serial, click Connect, then Read"])
-    return f"""<div class="page steps"><h1>Back up first</h1>
+    return f"""<div class="page steps"><h1>Back up</h1>
 <p>Save three things before changing anything. Each one lets you undo a mistake.</p>{body}
 <p class="note">To undo Edit Mode changes, delete presets.ini and presets.tmp from the card, then restart the saber.</p>
 <p class="tip">You can recover from a bad upload. Hold BOOT, press RESET, then let go of BOOT, and the processor's built-in bootloader takes new firmware.</p>
@@ -965,7 +948,7 @@ def page_config(pn):
                'WS281XBladePtr<144, bladePin,       // pixels, data pin\n'
                '  Color8::GRB,\n'
                '  PowerPINS<bladePowerPin2, bladePowerPin3> >()')
-    return f"""<div class="page"><h1>The config file</h1>
+    return f"""<div class="page"><h1>config</h1>
 <p>A config is one C++ file that describes this saber. ProffieOS reads it once for each section.</p>
 <table class="tbl spec" style="margin-top:2.5mm"><tr><th>Section</th><th>Holds</th></tr>{t}</table>
 {code(snippet)}
@@ -1029,7 +1012,29 @@ def page_mods(pn):
              ("Add Bluetooth", "An FSC-BT630 module lets Workbench connect without a cable"),
              ("Read the hardware", f"KiCad files and the schematic are at {link('fredrik.hubbe.net/lightsaber/v5')}")]
     body = "".join(f'<div class="qa"><div><b>{a}</b><p>{sent(b)}</p></div></div>' for a, b in ideas)
-    return f"""<div class="page"><h1>Modding ideas</h1>{body}<div class="pn">&lt; {pn} &gt;</div></div>"""
+    return f"""<div class="page"><h1>Example Mods</h1>{body}<div class="pn">&lt; {pn} &gt;</div></div>"""
+
+
+ACCESSORIES = [  # (QR key, image, height in mm: rough relative size, name, description)
+    ("plug", "plug", 11.2, "Blade Plug", "Fits into the blade socket of a hilt when the blade is removed to protect the internal components from dust and debris"),
+    ("clip", "clip", 9, "Covertec Belt Clip", "Hang your saber with the Covertec hook and belt clip; fits belts up to 3.5 cm wide"),
+    ("pokr", "core", 15, "PO x KR Sabers Core", "Next-generation saber core for unbeatable sound performance: deeper bass, richer tones, and vibration that resonates through the hilt"),
+    ("wallmount", "wallmount", 15, "Wall Mount", "A simple mount that holds your hilt horizontally on the wall, turning any room into a lightsaber showcase"),
+    ("stand", "stand", 13, "Display Stand", "The durable construction ensures your saber remains securely supported, offering peace of mind while on display"),
+    ("floating", "floating", 34, "Floating Display", "Holds your hilt magnetically, so the saber hangs free, floats, and turns on its own axis")]
+
+
+def page_accessories(pn):
+    body = "".join(f'<figure><div class="pic {im}"><img src="img/acc/{im}.png" style="max-height:{h}mm" alt=""></div>'
+                   f'<figcaption><b>{link(t, QR_URLS[k])}</b><p>{sent(d)}</p></figcaption></figure>' for k, im, h, t, d in ACCESSORIES)
+    return f"""<div class="page"><h1>Accessories and Upgrades</h1><div class="acc">{body}</div>
+<p class="tip">QR codes for these links are on the next page.</p>
+<div class="pn">&lt; {pn} &gt;</div></div>"""
+
+
+def page_acc_links(pn):
+    body = "".join(f'<figure>{qr(k)}<figcaption><b>{link(t, QR_URLS[k])}</b></figcaption></figure>' for k, im, h, t, d in ACCESSORIES)
+    return f"""<div class="page"><h1>Accessory links</h1><div class="links">{body}</div><div class="pn">&lt; {pn} &gt;</div></div>"""
 
 
 def page_links(pn):
@@ -1208,7 +1213,7 @@ def page_blade(pn):
 def page_crystal(pn):
     steps = [f"Find the sleeve screw on the back of the hilt, behind the crystal window (page {P['structure']}, part 9)",
              "Loosen it about half a turn with the hex key. Don't take it out",
-             "Turn the silver sleeve until the window closes, or opens again. Don't force it",
+             "Turn the silver sleeve until the window closes or opens again. Don't force it",
              "Tighten the screw"]
     body = "".join(f'<div class="step">{num(i)}<div><p>{sent(t)}</p></div></div>' for i, t in enumerate(steps, 1))
     art = (f'<svg viewBox="0 40 220 {JOINT_Y + 22 - 40:.0f}" class="art" style="height:50mm">'
@@ -1217,22 +1222,22 @@ def page_crystal(pn):
            f'<path class="arrow" data-head="1" d="M82 226C94 250 126 250 138 226"/>'
            f'<text x="50" y="{JOINT_Y + 18:.0f}" class="cap">Open</text><text x="170" y="{JOINT_Y + 18:.0f}" class="cap">Closed</text></svg>')
     return f"""<div class="page steps"><h1>Crystal cover</h1>{art}
-<p>The silver sleeve around the crystal chamber turns, so the window shows either the crystals or the black back of the chamber. Quinlan Vos's hilt in The Clone Wars has no window, so the closed look matches the show.</p>
+<p>The silver sleeve around the crystal chamber turns, so the window shows either the crystals or the black back of the chamber. To change:</p>
 {body}
 <div class="pn">&lt; {pn} &gt;</div></div>"""
 
-SECTIONS = [  # (title, page key, 0 section / 1 indented / 2 part)
-    ("1 · Get Started", "p1", 2), ("Safety", "safety", 0), ("Anatomy", "anatomy", 0), ("Structure", "structure", 0), ("In the box", "box", 0), ("How it fits together", "parts", 0),
-    ("Quick start", "quick", 0), ("Charging", "charging", 0), ("Crystal cover", "crystal", 0), ("The button", "button", 0),
-    ("Blade angle", "angle", 0), ("Control", "off", 0),
-    ("Color", "color", 0), ("Music", "music", 0), ("Motion", "motion", 0), ("Common errors", "errors", 0), ("Troubleshooting", "trouble", 0),
-    ("2 · Technical Specs", "p2", 2), ("Specifications", "specs", 0), ("Electronics", "tech", 0), ("Core", "core", 0), ("Board", "board", 0), ("Board pads", "pads", 0), ("Blade", "blade", 0),
-    ("3 · Customization", "p3", 2), ("How the core works", "works", 0), ("What is Proffie", "proffie", 0), ("What you can change", "change", 0), ("Edit Mode", "edit", 0),
-    ("Rehearsal", "rehearsal", 0), ("Sound fonts", "fonts", 0),
-    ("Get started with Proffie", "connect", 0), ("Connect a computer", "connect", 1), ("Back up first", "backup", 1),
-    ("Set up the code", "setup", 1), ("Your first change", "first", 1),
-    ("The config file", "config", 0), ("Blade styles", "styles", 0), ("Under the hood", "hood", 0), ("Modding ideas", "mods", 0), ("Other sabers", "types", 0), ("Saber types", "types", 1), ("What fits what", "fits", 1), ("Proffie vs others", "vs", 1),
-    ("Resources", "links", 0), ("Glossary", "glossary", 0),
+SECTIONS = [  # (title, page key, 0 section / 1 indented / 2 part); title None: the page's own heading, so renaming a page renames its entry
+    (None, "p1", 2), ("Safety", "safety", 0), (None, "anatomy", 0), (None, "structure", 0), (None, "box", 0), (None, "parts", 0),
+    (None, "quick", 0), (None, "charging", 0), (None, "crystal", 0), (None, "button", 0),
+    (None, "angle", 0), (None, "off", 0),
+    (None, "color", 0), (None, "music", 0), (None, "motion", 0), (None, "errors", 0), (None, "trouble", 0),
+    (None, "p2", 2), (None, "specs", 0), (None, "tech", 0), (None, "core", 0), (None, "board", 0), (None, "pads", 0), (None, "blade", 0),
+    (None, "p3", 2), (None, "works", 0), (None, "proffie", 0), (None, "change", 0), (None, "edit", 0),
+    (None, "rehearsal", 0), (None, "fonts", 0),
+    ("Get started with Proffie", "connect", 0), (None, "connect", 1), (None, "backup", 1),
+    (None, "setup", 1), (None, "first", 1),
+    (None, "config", 0), (None, "styles", 0), (None, "hood", 0), (None, "mods", 0), (None, "types", 0), ("Accessories &amp; upgrades", "accessories", 0),
+    (None, "links", 0), (None, "glossary", 0),
 ]
 
 
@@ -1250,9 +1255,17 @@ def page_cover(pn):
 <div class="pm">PRODUCT<br>MANUAL</div></div></div>"""
 
 
+def heading(key):
+    """A page's title as printed: its h1 without the subtitle, or "1 · Get Started" for a part divider."""
+    h = dict(ORDER)[key](P[key])
+    if m := re.search(r'<div class="big">(.*?)</div>.*?<div class="name">(.*?)</div>', h, re.S):
+        return f"{m[1]} · {m[2]}"
+    return re.sub(r"<small.*?</small>|<[^>]+>", "", re.search(r"<h1[^>]*>(.*?)</h1>", h, re.S)[1]).strip()
+
+
 def page_contents(pn):
     """Two columns: parts 1 and 2 on the left, part 3 on the right."""
-    rows = [f'<a class="{("sec", "ind", "pt")[ind]}"><span>{t}</span><i></i><span>{P[k]:02d}</span></a>'
+    rows = [f'<a class="{("sec", "ind", "pt")[ind]}"><span>{t or heading(k)}</span><i></i><span>{P[k]:02d}</span></a>'
             for t, k, ind in sorted(SECTIONS, key=lambda r: (P[r[1]], r[2]))]
     split = next(i for i, (t, k, ind) in enumerate(sorted(SECTIONS, key=lambda r: (P[r[1]], r[2]))) if k == "p3")
     return f'<div class="page toc"><h2>Contents</h2><div class="cols"><div>{"".join(rows[:split])}</div><div>{"".join(rows[split:])}</div></div></div>'
@@ -1266,10 +1279,10 @@ def page_part(n, name):
 def page_safety(pn):
     warn = '<svg viewBox="0 0 20 18" style="width:4mm;height:3.6mm"><path d="M10 1L19 17H1Z" fill="#E44F44"/><path d="M10 6.5V11.5M10 13.6V14.2" stroke="#0E0E0E" stroke-width="1.8" stroke-linecap="round"/></svg>'
     return f"""<div class="page safe"><h2>Safety notice</h2><div class="dash"></div>
-<p>Charge the saber to full before you first use it. Charge it only with the included cable and a 5V 1A USB charger. A stronger charger can damage the battery and electronics.</p>
-<p>Don't leave the saber charging unattended, and unplug it when it's full.</p>
+<p>Only charge the saber using the included cable and a 5V 1A USB charger. A stronger charger can damage the battery and electronics.</p>
+<p>Don't leave the saber charging unattended, and unplug it when it's fully charged.</p>
 <div class="warn"><span>{warn}Warning</span></div>
-<p>Keep it away from young children. Older children use it with an adult present.</p>
+<p>Keep away from young children. Older children should use it with an adult present.</p>
 <p>Duel with control and respect. Don't aim at faces, and stop if the blade cracks.</p></div>"""
 
 
@@ -1287,7 +1300,7 @@ def page_specs(pn):
 
 def page_box(pn):
     items = [("Hilt", "with Proffie core"), ("Blade", "32 in (81 cm)"), ("USB-C cable", ""),
-             ("Hex key and spare screws", "The 3 mm screws hold the blade")]
+             ("Hex key and spare screws", "M4 x 3 mm screws (blade screws)")]
     body = "".join(f"<div>{a}{f'<small>{b}</small>' if b else ''}</div>" for a, b in items)
     videos = [("gallery", "Product video", "0:30",
                "The core lighting up, then the blade going in and the saber lit"),
@@ -1309,7 +1322,13 @@ QR_URLS = {"gallery": "https://gv.videocdn.alibaba.com/icbu_vod_video/video_targ
            "core": "https://www.alibaba.com/product-detail/Proffie-V2-2-Pogo-Core-Accent_1601792428062.html",
            "blade": "https://www.alibaba.com/product-detail/LGT-Heavy-Dueling-1inch-3mm-92cm_1601574174450.html",
            "cable": "https://thesaberarmory.com/products/low-profile-micro-usb-data-transfer-cable-20cm",
-           "online": "https://lightsaber-proffie-quinlan-vos-manual.pages.dev/"}
+           "online": "https://lightsaber-proffie-quinlan-vos-manual.pages.dev/",
+           "plug": "https://padawanoutpost.com/products/blade-plugs?variant=37207185260702",
+           "clip": "https://padawanoutpost.com/products/covertec-hook-belt?variant=42903202922738",
+           "pokr": "https://padawanoutpost.com/products/po-x-kr-core?variant=55788716556670",
+           "wallmount": "https://padawanoutpost.com/products/saber-wall-mounts?variant=44233505308914",
+           "stand": "https://saberlight.com.au/en-uk/products/display-stand-with-nameplate?variant=47230761402537",
+           "floating": "https://padawanoutpost.com/products/floating-lightsaber-display-stand?variant=58171560460670"}
 QR_VERSION = 8  # the longest URL (gallery) needs version 8 at level M; every code uses it, so every module is the same size
 
 
@@ -1439,8 +1458,8 @@ ORDER = [("cover", page_cover), ("contents", page_contents),
          ("p2", page_part(2, "Technical Specs")), ("specs", page_specs), ("tech", page_tech), ("core", page_core), ("board", page_board), ("pads", page_pads), ("blade", page_blade),
          ("p3", page_part(3, "Customization")), ("works", page_works), ("proffie", page_proffie), ("change", page_change), ("edit", page_edit), ("rehearsal", page_rehearsal),
          ("fonts", page_fonts), ("connect", page_connect), ("backup", page_backup), ("setup", page_setup), ("first", page_first),
-         ("config", page_config), ("styles", page_styles), ("hood", page_hood), ("mods", page_mods), ("types", page_types), ("fits", page_fits), ("vs", page_vs), ("links", page_links),
-         ("glossary", page_glossary)]
+         ("config", page_config), ("styles", page_styles), ("hood", page_hood), ("mods", page_mods), ("links", page_links), ("types", page_types),
+         ("glossary", page_glossary), ("accessories", page_accessories), ("acc_links", page_acc_links)]
 P = {k: i for i, (k, _) in enumerate(ORDER, 1)}  # page numbers, cover = 1
 BLANK = ("blank", lambda pn: '<div class="page"></div>')
 
@@ -1564,7 +1583,7 @@ def build():
     logo = here / "img/padawan_outpost_cover.svg"
     (here / "img/padawan_outpost_cover_light.svg").write_text(recolor(logo.read_text()))
     lighten = lambda html: (recolor(html).replace("img/padawan_outpost_cover.svg", "img/padawan_outpost_cover_light.svg")
-                            .replace("img/saber_lit.png", "img/saber_lit_print.png"))  # half size, on white, no transparency: some viewers drop large or transparent images
+                            .replace("img/saber_lit.png", "img/saber_lit_print.png").replace("img/acc/", "img/acc_print/"))  # half size, on white, no transparency: some viewers drop large or transparent images
     light = lighten(body)  # read online: the dark edition's page order, no blank pages
     dark_order = ORDER
     use_order(print_order())
