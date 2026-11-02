@@ -1441,8 +1441,19 @@ ORDER = [("cover", page_cover), ("contents", page_contents),
          ("config", page_config), ("styles", page_styles), ("hood", page_hood), ("mods", page_mods), ("types", page_types), ("fits", page_fits), ("vs", page_vs), ("links", page_links),
          ("glossary", page_glossary)]
 P = {k: i for i, (k, _) in enumerate(ORDER, 1)}  # page numbers, cover = 1
-# Light edition: a blank left page behind the cover, so the contents open on a right-hand page.
-LIGHT_ORDER = ORDER[:1] + [("blank", lambda pn: '<div class="page"></div>')] + ORDER[1:]
+BLANK = ("blank", lambda pn: '<div class="page"></div>')
+
+
+def print_order():
+    """Printed booklet, book convention: the contents and each part divider open on a right-hand (odd) page,
+    and each divider's back is blank, so the part's first page opens on the right too."""
+    out = ORDER[:1] + [BLANK] + ORDER[1:2]
+    for key, f in ORDER[2:]:
+        if key in ("p1", "p2", "p3"):
+            out += [BLANK] * (len(out) % 2) + [(key, f), BLANK]
+        else:
+            out.append((key, f))
+    return out
 
 
 def use_order(order):
@@ -1544,9 +1555,10 @@ def build():
     (here / "img/padawan_outpost_cover_light.svg").write_text(recolor(logo.read_text()))
     lighten = lambda html: (recolor(html).replace("img/padawan_outpost_cover.svg", "img/padawan_outpost_cover_light.svg")
                             .replace("img/saber_lit.png", "img/saber_lit_print.png"))  # half size, on white, no transparency: some viewers drop large or transparent images
+    light = lighten(body)  # read online: the dark edition's page order, no blank pages
     dark_order = ORDER
-    use_order(LIGHT_ORDER)
-    light, sheets = lighten(f"{symbols()}\n{spreads()}"), lighten(f"{symbols()}\n{booklet()}")
+    use_order(print_order())
+    sheets = lighten(f"{symbols()}\n{booklet()}")
     use_order(dark_order)
     for name, html, pdf in (("manual.html", page(CSS, body), "Quinlan_Vos_Proffie_Manual.pdf"),
                             ("manual_light.html", page(recolor(CSS) + LIGHT_CSS, light), "Quinlan_Vos_Proffie_Manual_Light_A5.pdf"),
