@@ -1441,6 +1441,16 @@ ORDER = [("cover", page_cover), ("contents", page_contents),
          ("config", page_config), ("styles", page_styles), ("hood", page_hood), ("mods", page_mods), ("types", page_types), ("fits", page_fits), ("vs", page_vs), ("links", page_links),
          ("glossary", page_glossary)]
 P = {k: i for i, (k, _) in enumerate(ORDER, 1)}  # page numbers, cover = 1
+# Light edition: a blank left page behind the cover, so the contents open on a right-hand page.
+LIGHT_ORDER = ORDER[:1] + [("blank", lambda pn: '<div class="page"></div>')] + ORDER[1:]
+
+
+def use_order(order):
+    """Switch the page order; P (page numbers, used by every cross-reference) follows it."""
+    global ORDER
+    ORDER = order
+    P.clear()
+    P.update({k: i for i, (k, _) in enumerate(order, 1)})
 
 
 def spreads():
@@ -1451,8 +1461,10 @@ def spreads():
 
 ARROW_JS = """<script>
 // Every green arrow: same line width and the same closed head on paper; every caption the same text size.
+// --z: the light edition's page zoom; sizes on paper grow with it.
 addEventListener("load", () => {
-  const mm = 96 / 25.4, W = .132 * mm, HL = .63 * mm, HW = .45 * mm, CAP = 5.6 / 72 * 96;
+  const z = +getComputedStyle(document.documentElement).getPropertyValue("--z") || 1;
+  const mm = 96 / 25.4 * z, W = .132 * mm, HL = .63 * mm, HW = .45 * mm, CAP = 5.6 / 72 * 96 * z;
   const scale = el => { const m = el.getScreenCTM(); return Math.hypot(m.a, m.b) };
   document.querySelectorAll(".arrow").forEach(a => {
     const k = scale(a), ks = getComputedStyle(a).vectorEffect == "non-scaling-stroke" ? 1 : k;
@@ -1468,21 +1480,81 @@ addEventListener("load", () => {
     a.after(h);
   });
   document.querySelectorAll(".cap").forEach(t => t.style.fontSize = CAP / scale(t) + "px");
-  document.querySelectorAll("[data-pt]").forEach(t => t.style.fontSize = t.dataset.pt / 72 * 96 / scale(t) + "px");
+  document.querySelectorAll("[data-pt]").forEach(t => t.style.fontSize = t.dataset.pt / 72 * 96 * z / scale(t) + "px");
 });
 </script>"""
 
 
+# Light edition: white pages for print, the same 85 x 130 mm layout zoomed to fill A5 (two to an A4 sheet).
+# Colours swap through LIGHT; the dark edition's page colour (#0E0E0E) becomes white everywhere.
+ZOOM = 210 / 130
+LIGHT = {"#2a2a2a": "#e6e6e6", "#0e0e0e": "#ffffff", "#bebebe": "#333333", "#c8c8c8": "#111111", "#d4d4d4": "#111111",
+         "#d6d6d6": "#222222", "#bdbdbd": "#444444", "#cfcfcf": "#222222", "#3a3a3a": "#d0d0d0", "#2c2c2c": "#dcdcdc",
+         "#131313": "#f4f4f4", "#161616": "#f4f4f4", "#9a9a9a": "#5e5e5e", "#8f8f8f": "#666666", "#a8a8a8": "#4a4a4a",
+         "#a0a0a0": "#4a4a4a", "#b2b2b2": "#e8e8e8", "#7f7f7f": "#888888", "#4a4a4a": "#b5b5b5", "#5a5a5a": "#9a9a9a",
+         "#8c8c8c": "#666666", "#6a6a6a": "#777777", "#7a7a7a": "#808080",
+         "#9fd69b": "#2f8a2a", "#f0a39d": "#c8382e", "#9a9a96": "#6f6f6b"}  # angle labels, board edge
+LIGHT_CSS = f"""
+:root {{ --z: {ZOOM:.6f} }}
+@page {{ size: 148mm 210mm; margin: 0 }}
+.page {{ zoom: var(--z); margin: 0 auto }}
+@media screen {{ .spread {{ width: {170 * ZOOM:.1f}mm }} }}  /* pages at full size on screen too, so the load-time text sizing matches print */
+.qr svg, .links svg, .src svg {{ outline: .25mm solid #d0d0d0; outline-offset: -.25mm }}
+@media print {{ .page {{ height: 129.9mm }} }}
+"""
+
+
+BOOKLET_CSS = """
+@page { size: 297mm 210mm; margin: 0 }
+.sheet { display: flex; justify-content: space-around; width: 297mm; height: 210mm; margin: 0 auto 6mm; background: #fff; break-after: page }
+.sheet .page { margin: 0; page-break-after: auto; break-after: auto }
+@media print { .sheet { margin: 0 } }
+"""
+
+
+def booklet():
+    """A4 sheets for double-sided printing, folded and stapled on the fold: front [n, 1], back [2, n - 1], and so on.
+    Blank pages at the back make the count a multiple of 4."""
+    pages = [f(P[k]) for k, f in ORDER]
+    pages += ['<div class="page"></div>'] * (-len(pages) % 4)
+    n = len(pages)
+    order = [pair for i in range(n // 4) for pair in ((n - 2 * i, 2 * i + 1), (2 * i + 2, n - 2 * i - 1))]
+    return "\n".join(f'<div class="sheet">{pages[a - 1]}{pages[b - 1]}</div>' for a, b in order)
+
+
+def recolor(text):
+    """Dark-edition colours to light ones; only exact hex values in LIGHT change."""
+    return re.sub(r"#[0-9A-Fa-f]{6}\b", lambda m: LIGHT.get(m.group().lower(), m.group()), text)
+
+
+CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+
+
 def build():
-    html = f"""<!doctype html><html><head><meta charset="utf-8"><title>Quinlan Vos Manual</title>
+    """manual.html (dark, 85 x 130 mm), manual_light.html (white, A5) and manual_booklet.html (the light pages
+    on A4 in booklet order), each printed to PDF."""
+    here = Path(__file__).parent
+    body = f"{symbols()}\n{spreads()}"
+    page = lambda css, body: f"""<!doctype html><html><head><meta charset="utf-8"><title>Quinlan Vos Manual</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-<style>{CSS}</style></head><body>{symbols()}
-{spreads()}
+<style>{css}</style></head><body>{body}
 {ARROW_JS}
 </body></html>"""
-    out = Path(__file__).with_name("manual.html")
-    out.write_text(html)
-    print(out)
+    logo = here / "img/padawan_outpost_cover.svg"
+    (here / "img/padawan_outpost_cover_light.svg").write_text(recolor(logo.read_text()))
+    lighten = lambda html: (recolor(html).replace("img/padawan_outpost_cover.svg", "img/padawan_outpost_cover_light.svg")
+                            .replace("img/saber_lit.png", "img/saber_lit_print.png"))  # half size, on white, no transparency: some viewers drop large or transparent images
+    dark_order = ORDER
+    use_order(LIGHT_ORDER)
+    light, sheets = lighten(f"{symbols()}\n{spreads()}"), lighten(f"{symbols()}\n{booklet()}")
+    use_order(dark_order)
+    for name, html, pdf in (("manual.html", page(CSS, body), "Quinlan_Vos_Proffie_Manual.pdf"),
+                            ("manual_light.html", page(recolor(CSS) + LIGHT_CSS, light), "Quinlan_Vos_Proffie_Manual_Light_A5.pdf"),
+                            ("manual_booklet.html", page(recolor(CSS) + LIGHT_CSS + BOOKLET_CSS, sheets), "Quinlan_Vos_Proffie_Manual_Light_A4_Booklet.pdf")):
+        (here / name).write_text(html)
+        subprocess.run([CHROME, "--headless", "--no-pdf-header-footer", "--allow-file-access-from-files", "--virtual-time-budget=10000",
+                        f"--print-to-pdf={here / pdf}", str(here / name)], check=True, capture_output=True)
+        print(here / pdf)
 
 
 if __name__ == "__main__":

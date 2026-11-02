@@ -447,8 +447,10 @@ pre code { display: block } pre .c { color: #7f7f7f }
 <div class="pn">&lt; 46 &gt;</div></div></div>
 <script>
 // Every green arrow: same line width and the same closed head on paper; every caption the same text size.
+// --z: the light edition's page zoom; sizes on paper grow with it.
 addEventListener("load", () => {
-  const mm = 96 / 25.4, W = .132 * mm, HL = .63 * mm, HW = .45 * mm, CAP = 5.6 / 72 * 96;
+  const z = +getComputedStyle(document.documentElement).getPropertyValue("--z") || 1;
+  const mm = 96 / 25.4 * z, W = .132 * mm, HL = .63 * mm, HW = .45 * mm, CAP = 5.6 / 72 * 96 * z;
   const scale = el => { const m = el.getScreenCTM(); return Math.hypot(m.a, m.b) };
   document.querySelectorAll(".arrow").forEach(a => {
     const k = scale(a), ks = getComputedStyle(a).vectorEffect == "non-scaling-stroke" ? 1 : k;
@@ -464,7 +466,7 @@ addEventListener("load", () => {
     a.after(h);
   });
   document.querySelectorAll(".cap").forEach(t => t.style.fontSize = CAP / scale(t) + "px");
-  document.querySelectorAll("[data-pt]").forEach(t => t.style.fontSize = t.dataset.pt / 72 * 96 / scale(t) + "px");
+  document.querySelectorAll("[data-pt]").forEach(t => t.style.fontSize = t.dataset.pt / 72 * 96 * z / scale(t) + "px");
 });
 </script>
 </body></html>
