@@ -1308,7 +1308,8 @@ QR_URLS = {"gallery": "https://gv.videocdn.alibaba.com/icbu_vod_video/video_targ
            "workbench": "https://profezzorn.github.io/lightsaber-web-bluetooth/app.html", "github": "https://github.com/profezzorn/ProffieOS",
            "core": "https://www.alibaba.com/product-detail/Proffie-V2-2-Pogo-Core-Accent_1601792428062.html",
            "blade": "https://www.alibaba.com/product-detail/LGT-Heavy-Dueling-1inch-3mm-92cm_1601574174450.html",
-           "cable": "https://thesaberarmory.com/products/low-profile-micro-usb-data-transfer-cable-20cm"}
+           "cable": "https://thesaberarmory.com/products/low-profile-micro-usb-data-transfer-cable-20cm",
+           "online": "https://lightsaber-proffie-quinlan-vos-manual.pages.dev/"}
 QR_VERSION = 8  # the longest URL (gallery) needs version 8 at level M; every code uses it, so every module is the same size
 
 
@@ -1444,10 +1445,17 @@ P = {k: i for i, (k, _) in enumerate(ORDER, 1)}  # page numbers, cover = 1
 BLANK = ("blank", lambda pn: '<div class="page"></div>')
 
 
+def page_online(pn):
+    """Back of the printed cover: a QR code to the online manual."""
+    return (f'<div class="page divider online"><p>Read this manual online:</p>'
+            f'<a href="{QR_URLS["online"]}">{qr("online")}</a></div>')
+
+
 def print_order():
     """Printed booklet, book convention: the contents and each part divider open on a right-hand (odd) page,
-    and each divider's back is blank, so the part's first page opens on the right too."""
-    out = ORDER[:1] + [BLANK] + ORDER[1:2]
+    and each divider's back is blank, so the part's first page opens on the right too. The cover's back links to
+    the online manual."""
+    out = ORDER[:1] + [("online", page_online)] + ORDER[1:2]
     for key, f in ORDER[2:]:
         if key in ("p1", "p2", "p3"):
             out += [BLANK] * (len(out) % 2) + [(key, f), BLANK]
@@ -1510,7 +1518,9 @@ LIGHT_CSS = f"""
 @page {{ size: 148mm 210mm; margin: 0 }}
 .page {{ zoom: var(--z); margin: 0 auto }}
 @media screen {{ .spread {{ width: {170 * ZOOM:.1f}mm }} }}  /* pages at full size on screen too, so the load-time text sizing matches print */
-.qr svg, .links svg, .src svg {{ outline: .25mm solid #d0d0d0; outline-offset: -.25mm }}
+.online p {{ font-size: var(--sub); font-weight: 500; color: #111111; margin: 0 0 4mm }}
+.online svg {{ display: block; width: 30mm; height: 30mm; border-radius: 1.4mm }}
+.qr svg, .links svg, .src svg, .online svg {{ outline: .25mm solid #d0d0d0; outline-offset: -.25mm }}
 @media print {{ .page {{ height: 129.9mm }} }}
 """
 
