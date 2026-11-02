@@ -624,7 +624,8 @@ def page_color(pn):
         "Hold the blade level and roll the whole saber on its long axis. The blade steps through the colors",
         "Click to save the color. Long Click to cancel and keep the old one",
     ]
-    body = "".join(f'<div class="step">{num(i)}<div><p>{sent(t)}</p></div></div>' for i, t in enumerate(steps, 1))
+    pics = {2: dial("display:block;height:13mm;margin:1.5mm auto 0")}
+    body = "".join(f'<div class="step">{num(i)}<div><p>{sent(t)}</p>{pics.get(i, "")}</div></div>' for i, t in enumerate(steps, 1))
     style = ctl_table([("Triple Click + Long Click|parallel or up", "Next blade style"),
                        ("Triple Click + Long Click|down", "Previous blade style")])
     return f"""<div class="page steps nosep"><h1>Color</h1>{art}{body}
@@ -661,6 +662,22 @@ def mini(extra):
     return f'<svg viewBox="-200 30 726 132">{blade_h(14 - FADE_L, 14, lit=True, fade=True)}{hz("top-mini", "body-mini", dx=-30)}{extra}</svg>'
 
 
+def dial(style=""):
+    """The pommel end seen head-on as a dial: a tick for each 30° menu step, the top slot as the pointer,
+    a green arrow each way. Turn right is clockwise (Fett263's prop notes), seen from the pommel."""
+    rad, t0, t1, ra = POMMEL_R, POMMEL_R + 5, POMMEL_R + 9, POMMEL_R + 15
+    ticks = "".join(f'<path d="M{t0 * math.sin(math.radians(a)):.1f} {-t0 * math.cos(math.radians(a)):.1f}'
+                    f'L{t1 * math.sin(math.radians(a)):.1f} {-t1 * math.cos(math.radians(a)):.1f}"/>' for a in range(0, 360, 30))
+    pt = lambda a: f"{ra * math.sin(math.radians(a)):.1f} {-ra * math.cos(math.radians(a)):.1f}"
+    arrows = (f'<path class="arrow" data-head="1" d="M{pt(15)}A{ra} {ra} 0 0 1 {pt(75)}"/>'
+              f'<path class="arrow" data-head="1" d="M{pt(-15)}A{ra} {ra} 0 0 0 {pt(-75)}"/>')
+    return (f'<svg viewBox="-82 -46 164 88" style="{style}"><g transform="rotate(-90)">{pommel_end(0, 0, shaded=True)}</g>'
+            f'<g stroke="#8a8a8a" stroke-width="1">{ticks}</g>'
+            f'<path d="M0 {-t1 - 3}V{-t0 + 1}" stroke="{GREEN}" stroke-width="2.2"/>{arrows}'
+            f'<text class="cap" x="{ra + 8}" y="4" style="text-anchor:start">Right</text>'
+            f'<text class="cap" x="{-ra - 8}" y="4" style="text-anchor:end">Left</text></svg>')
+
+
 def page_motion(pn):
     twist = '<path class="arrow" data-head="1" d="M412 54C436 58 436 134 412 138"/>'
     rows = [
@@ -674,6 +691,8 @@ def page_motion(pn):
          '<path class="arrow" data-head="1" d="M300 46H140"/>' + twist),
     ]
     body = "".join(f'<div class="mo">{mini(art)}<div><b>{t}</b><span>{sent(d)}</span></div></div>' for t, d, art in rows)
+    body += (f'<div class="mo">{dial("height:13mm")}<div><b>Like a dial</b><span>Point the blade away from you and look at the pommel. '
+             f'Turn right is clockwise. Each tick is one step.</span></div></div>')
     return f"""<div class="page"><h1>Motion</h1><div class="mos">{body}</div><div class="pn">&lt; {pn} &gt;</div></div>"""
 
 
